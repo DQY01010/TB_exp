@@ -20,3 +20,7 @@
 /BenMalData/hamartoma/
 /BenMalData/infectious/
 /BenMalData/inflammatory_pseudo
+__pycache__/*
+/DeepBenMal/__pycache__/
+/DeepBenMal/models/__pycache__/
+
