@@ -15,3 +15,8 @@
 *.pkl
 /DeepBenMal/valid_5
 *.jpg
+/BenMalData/phthisis/
+/BenMalData/chronicTissueInflam/
+/BenMalData/hamartoma/
+/BenMalData/infectious/
+/BenMalData/inflammatory_pseudo
