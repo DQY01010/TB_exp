@@ -7,7 +7,7 @@ import torch
 import os
 import sys
 from torch.nn import DataParallel
-from DataIter import MBDataIter,MBDataIterTask1,MBDataIterTask2,MBDataIterTask3,MBDataIterTask4
+from DataIter import MBDataIterTask1,MBDataIterTask2,MBDataIterTask3,MBDataIterTask4,MBDataIterTask5
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 import time
@@ -188,47 +188,46 @@ if __name__ == '__main__':
     opt.scales = [opt.initial_scale]
 
     # construct training data iterator
-    if opt.n_classes == 1:
-        train_iter = MBDataIter(
+    if opt.task == "task1":
+        train_iter = MBDataIterTask1(
             data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
             phase='train',
             crop_size=opt.crop_size,
             crop_depth=opt.sample_duration,
             sample_size=opt.sample_size,
             sample_phase=None)
-    else:
-        if opt.task == "task2":
-            train_iter = MBDataIterTask2(
-                data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
-                phase='train',
-                crop_size=opt.crop_size,
-                crop_depth=opt.sample_duration,
-                sample_size=opt.sample_size,
-                sample_phase=None)
-        elif opt.task == "task3":
-            train_iter = MBDataIterTask3(
-                data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
-                phase='train',
-                crop_size=opt.crop_size,
-                crop_depth=opt.sample_duration,
-                sample_size=opt.sample_size,
-                sample_phase=None)
-        elif opt.task == "task1":
-            train_iter = MBDataIterTask1(
-                data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
-                phase='train',
-                crop_size=opt.crop_size,
-                crop_depth=opt.sample_duration,
-                sample_size=opt.sample_size,
-                sample_phase=None)
-        elif opt.task == "task4":
-            train_iter = MBDataIterTask4(
-                data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
-                phase='train',
-                crop_size=opt.crop_size,
-                crop_depth=opt.sample_duration,
-                sample_size=opt.sample_size,
-                sample_phase=None)
+    elif opt.task == "task2":
+        train_iter = MBDataIterTask2(
+            data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
+            phase='train',
+            crop_size=opt.crop_size,
+            crop_depth=opt.sample_duration,
+            sample_size=opt.sample_size,
+            sample_phase=None)
+    elif opt.task == "task3":
+        train_iter = MBDataIterTask3(
+            data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
+            phase='train',
+            crop_size=opt.crop_size,
+            crop_depth=opt.sample_duration,
+            sample_size=opt.sample_size,
+            sample_phase=None)
+    elif opt.task == "task4":
+        train_iter = MBDataIterTask4(
+            data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
+            phase='train',
+            crop_size=opt.crop_size,
+            crop_depth=opt.sample_duration,
+            sample_size=opt.sample_size,
+            sample_phase=None)
+    elif opt.task == "task5":
+        train_iter = MBDataIterTask5(
+            data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
+            phase='train',
+            crop_size=opt.crop_size,
+            crop_depth=opt.sample_duration,
+            sample_size=opt.sample_size,
+            sample_phase=None)
     
     train_loader = DataLoader(
         train_iter,
@@ -237,22 +236,21 @@ if __name__ == '__main__':
         num_workers=0,
         pin_memory=True)
     # construct testing data iterator
-    if opt.n_classes == 1:
-        test_iter = MBDataIter(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
-                           crop_depth=opt.sample_duration)
-    else:
-        if opt.task == "task1":
-            test_iter = MBDataIterTask1(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
+    if opt.task == "task1":
+        test_iter = MBDataIterTask1(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
                                     crop_depth=opt.sample_duration, sample_size=opt.sample_size)
-        elif opt.task == "task2":
-            test_iter = MBDataIterTask2(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
-                                        crop_depth=opt.sample_duration, sample_size=opt.sample_size)
-        elif opt.task == "task3":
-            test_iter = MBDataIterTask3(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
-                                        crop_depth=opt.sample_duration, sample_size=opt.sample_size)
-        elif opt.task == "task4":
-            test_iter = MBDataIterTask4(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
-                                        crop_depth=opt.sample_duration, sample_size=opt.sample_size)
+    elif opt.task == "task2":
+        test_iter = MBDataIterTask2(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
+                                    crop_depth=opt.sample_duration, sample_size=opt.sample_size)
+    elif opt.task == "task3":
+        test_iter = MBDataIterTask3(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
+                                    crop_depth=opt.sample_duration, sample_size=opt.sample_size)
+    elif opt.task == "task4":
+        test_iter = MBDataIterTask4(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
+                                    crop_depth=opt.sample_duration, sample_size=opt.sample_size)
+    elif opt.task == "task5":
+        test_iter = MBDataIterTask5(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
+                                    crop_depth=opt.sample_duration, sample_size=opt.sample_size)
     test_loader = DataLoader(
         test_iter,
         batch_size=opt.batch_size,
@@ -330,22 +328,21 @@ if __name__ == '__main__':
                 lr=opt.lr,
                 momentum=0.9,
                 weight_decay=1e-4)
-        if opt.n_classes == 1:
-            train_iter = MBDataIter(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
-                                crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
-        else:
-            if opt.task == "task1":
-                train_iter = MBDataIterTask1(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
-                                crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
-            elif opt.task == "task2":
-                train_iter = MBDataIterTask2(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
-                                crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
-            elif opt.task == "task3":
-                train_iter = MBDataIterTask3(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
-                                crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
-            elif opt.task == "task4":
-                train_iter = MBDataIterTask4(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
-                                crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
+        if opt.task == "task1":
+            train_iter = MBDataIterTask1(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
+                                         crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
+        elif opt.task == "task2":
+            train_iter = MBDataIterTask2(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
+                                         crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
+        elif opt.task == "task3":
+            train_iter = MBDataIterTask3(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
+                                         crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
+        elif opt.task == "task4":
+            train_iter = MBDataIterTask4(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
+                                         crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
+        lif opt.task == "task5":
+            train_iter = MBDataIterTask5(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
+                                         crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
         train_loader = DataLoader(
             train_iter,
             batch_size=opt.batch_size,

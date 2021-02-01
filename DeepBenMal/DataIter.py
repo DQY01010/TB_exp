@@ -21,7 +21,7 @@ class MBDataIterTask1(Dataset):
         ph_lst = []
         nonph_lst = []
         for i in range(len(self.data_arr)):
-            if 'nonPhthisis/' in self.data_arr[i]:
+            if 'phthisis/' in self.data_arr[i]:
                 nonph_lst.append(self.data_arr[i])
             else:
                 ph_lst.append(self.data_arr[i])
@@ -62,7 +62,7 @@ class MBDataIterTask1(Dataset):
         #label_lst = cur_dir.split('_')
         label = np.zeros((1,),dtype=np.float32)
         
-        if 'nonPhthisis' in cur_dir:
+        if 'phthisis' in cur_dir:
             label[0] = 0.0
         else:
             label[0] = 1.0
@@ -95,49 +95,111 @@ class MBDataIterTask1(Dataset):
         else:
             return len(self.sample_bboxes)
 
-class MBDataIterTask1(Dataset):
+class MBDataIterTask2(Dataset):
     def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
         # self.data_dir = data_dir 
         self.phase = phase
         self.data_arr = np.load(data_file)
-        self.data_dir = "/home/DeepPhthisis/BenMalData/screenlist"
-        phth_lst = []
-        hama_lst = []
-        inflama_lst = []
-        infec_lst = []
-        
+        self.data_dir = "/home/DeepPhthisis/BenMalData"
+        ph_lst = []
+        nonph_lst = []
         for i in range(len(self.data_arr)):
-            if 'hamartoma/' in self.data_arr[i]:
-                hama_lst.append(self.data_arr[i])
-            elif 'inflammatory_pseudo/' in self.data_arr[i]:
-                inflama_lst.append(self.data_arr[i])
-            elif 'infectious/' in self.data_arr[i]:
-                infec_lst.append(self.data_arr[i])
+            if 'phthisis/' in self.data_arr[i] or 'infectious/' in self.data_arr[i]:
+                nonph_lst.append(self.data_arr[i])
             else:
-                phth_lst.append(self.data_arr[i])
+                ph_lst.append(self.data_arr[i])
         
         if phase == "train":
-            self.data_lst = phth_lst * aug + hama_lst * aug + inflama_lst * aug + infec_lst * aug
-            '''minus_ben = len(ben_lst) - len(mal_lst)
+            minus_ben = len(nonph_lst) - len(ph_lst)
             if sample_phase == 'over':
-                random.shuffle(mal_lst)
-                if minus_ben > len(mal_lst):
-                    minus_ben = minus_ben - len(mal_lst)
-                    mal_cop = mal_lst[:minus_ben] + mal_lst
+                random.shuffle(ph_lst)
+                if minus_ben > len(ph_lst):
+                    minus_ben = minus_ben - len(ph_lst)
+                    mal_cop = ph_lst[:minus_ben] + ph_lst
                 else:
-                    mal_cop = mal_lst[:minus_ben]
-                self.data_lst = mal_cop * aug + mal_lst * aug + ben_lst * aug
+                    mal_cop = ph_lst[:minus_ben]
+                self.data_lst = mal_cop * aug + ph_lst * aug + nonph_lst * aug
                 
             elif sample_phase == 'under':
-                random.shuffle(ben_lst)
-                ben_cop = ben_lst[:len(mal_lst)]
-                self.data_lst = ben_cop + mal_lst
+                random.shuffle(nonph_lst)
+                ben_cop = nonph_lst[:len(ph_lst)]
+                self.data_lst = ben_cop + ph_lst
             else:
-                random.shuffle(ben_lst)
-                random.shuffle(mal_lst)
-                self.data_lst = ben_lst * aug + mal_lst * aug'''
+                random.shuffle(nonph_lst)
+                random.shuffle(ph_lst)
+                self.data_lst = nonph_lst * aug + ph_lst * aug
         else:
-            self.data_lst = phth_lst + hama_lst + inflama_lst + infec_lst
+            self.data_lst = nonph_lst + ph_lst
+            
+        random.shuffle(self.data_lst)
+        print("The total samples is %d" % self.__len__())
+        self.crop = Crop(size=crop_size,zslice=crop_depth,phase=self.phase)
+        self.augm = Augmentation(phase=self.phase)
+        #self.resize = Resize(size=[crop_depth,sample_size,sample_size])
+        #self.totensor = ToTensor()
+    def __getitem__(self, idx, split=None):
+        t = time.time()
+        np.random.seed(int(str(t%1)[2:7]))
+        
+        cur_dir = self.data_dir + self.data_lst[idx]
+        #label_lst = cur_dir.split('_')
+        label = np.zeros((1,),dtype=np.float32)
+        
+        if 'phthisis' in cur_dir or 'infectious' in cur_dir:
+            label[0] = 0.0
+        else:
+            label[0] = 1.0
+            
+        if self.phase == "train":
+            cur_idx = idx
+        else:
+            cur_idx = idx # self.test_dict[cur_dir]
+        imgs = self.crop(cur_dir)
+        #print(imgs.shape())
+        
+        
+        ## 训练的时候使用数据增广
+        if self.phase == "train":
+            imgs = self.augm(imgs)
+        
+        imgs = imgs[np.newaxis,:,:,:]
+        #imgs = self.totensor(imgs)
+        #imgs = self.resize(imgs)
+        
+        return torch.from_numpy(imgs.astype(np.float32)), torch.from_numpy(label.astype(np.float32)),cur_dir
+        #return torch.from_numpy(imgs.astype(np.float32)), torch.from_numpy(label.astype(np.float32)),cur_dir
+        
+    
+    def  __len__(self):
+        if self.phase == 'train':
+            return len(self.data_lst)
+        elif self.phase =='test':
+            return len(self.data_lst)
+        else:
+            return len(self.sample_bboxes)        
+        
+class MBDataIterTask3(Dataset):
+    def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
+        # self.data_dir = data_dir 
+        self.phase = phase
+        self.data_arr = np.load(data_file)
+        self.data_dir = "/home/DeepPhthisis/BenMalData"
+        infl_lst = []
+        ben_lst = []
+        chron_lst = []
+        
+        for i in range(len(self.data_arr)):
+            if 'chronicTissueInflam' in self.data_arr[i]:
+                chron_lst.append(self.data_arr[i])
+            if 'hamartoma/' in self.data_arr[i] or 'inflammatory_pseudo/' in self.data_arr[i]:
+                ben_lst.append(self.data_arr[i])
+            else:
+                infl_lst.append(self.data_arr[i])
+        
+        if phase == "train":
+            self.data_lst = infl_lst * aug + ben_lst * aug + chron_lst * aug
+        else:
+            self.data_lst = infl_lst + ben_lst + chron_lst
             
         random.shuffle(self.data_lst)
         print("The total samples is %d" % self.__len__())
@@ -150,16 +212,14 @@ class MBDataIterTask1(Dataset):
         
         cur_dir = self.data_dir + self.data_lst[idx]
         label_lst = cur_dir.split('_')
-        label = np.zeros((4,),dtype=np.float32)
+        label = np.zeros((3,),dtype=np.float32)
         
-        if 'infectious' in cur_dir:
-            label = 3
-        elif 'inflammatory_pseudo' in cur_dir:
-            label = 2
-        elif 'hamartoma' in cur_dir:
-            label = 1
+        if 'chronicTissueInflam' in cur_dir:
+            label = 2.0
+        elif 'hamartoma' in cur_dir or 'inflammatory_pseudo' in cur_dir:
+            label = 1.0
         else:
-            label = 0
+            label = 0.0
             
         if self.phase == "train":
             cur_idx = idx
@@ -184,31 +244,31 @@ class MBDataIterTask1(Dataset):
             return len(self.sample_bboxes)
 
 
-class MBDataIterTask2(Dataset):
+class MBDataIterTask4(Dataset):
     def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
         # self.data_dir = data_dir 
         self.phase = phase
         self.data_arr = np.load(data_file)
-        self.data_dir = "/home/DeepPhthisis/BenMalData/screenlist"
+        self.data_dir = "/home/DeepPhthisis/BenMalData"
         phth_lst = []
+        infe_lst = []
         hama_lst = []
-        inflama_lst = []
-        nodule_lst = []
+        infl_lst = []
         
         for i in range(len(self.data_arr)):
             if 'hamartoma/' in self.data_arr[i]:
                 hama_lst.append(self.data_arr[i])
             elif 'inflammatory_pseudo/' in self.data_arr[i]:
-                inflama_lst.append(self.data_arr[i])
-            elif 'inflammatoryNodule/' in self.data_arr[i]:
-                nodule_lst.append(self.data_arr[i])
+                infl_lst.append(self.data_arr[i])
+            elif 'infectious/' in self.data_arr[i]:
+                infe_lst.append(self.data_arr[i])
             else:
                 phth_lst.append(self.data_arr[i])
         
         if phase == "train":
-            self.data_lst = phth_lst * aug + hama_lst * aug + inflama_lst * aug + nodule_lst * aug
+            self.data_lst = phth_lst * aug + hama_lst * aug + infl_lst * aug + infe_lst * aug
         else:
-            self.data_lst = phth_lst + hama_lst + inflama_lst + nodule_lst
+            self.data_lst = phth_lst + hama_lst + infl_lst + infe_lst
             
         random.shuffle(self.data_lst)
         print("The total samples is %d" % self.__len__())
@@ -223,14 +283,14 @@ class MBDataIterTask2(Dataset):
         label_lst = cur_dir.split('_')
         label = np.zeros((4,),dtype=np.float32)
         
-        if 'inflammatoryNodule' in cur_dir:
-            label = 3
-        elif 'inflammatory_pseudo' in cur_dir:
-            label = 2
+        if 'inflammatory_pseudo' in cur_dir:
+            label = 3.0
         elif 'hamartoma' in cur_dir:
-            label = 1
+            label = 2.0
+        elif 'infectious' in cur_dir:
+            label = 1.0
         else:
-            label = 0
+            label = 0.0
             
         if self.phase == "train":
             cur_idx = idx
@@ -253,32 +313,36 @@ class MBDataIterTask2(Dataset):
         else:
             return len(self.sample_bboxes)
 
-class MBDataIterTask3(Dataset):
+class MBDataIterTask5(Dataset):
     def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
         # self.data_dir = data_dir 
         self.phase = phase
         self.data_arr = np.load(data_file)
-        self.data_dir = "/home/DeepPhthisis/BenMalData/screenlist"
+        self.data_dir = "/home/DeepPhthisis/BenMalData"
         phth_lst = []
+        infe_lst = []
         hama_lst = []
-        inflama_lst = []
-        chronic_lst = []
+        infl_lst = []
+        chroc_lst = []
         
         for i in range(len(self.data_arr)):
             if 'hamartoma/' in self.data_arr[i]:
                 hama_lst.append(self.data_arr[i])
             elif 'inflammatory_pseudo/' in self.data_arr[i]:
-                inflama_lst.append(self.data_arr[i])
+                infl_lst.append(self.data_arr[i])
+            elif 'infectious/' in self.data_arr[i]:
+                infe_lst.append(self.data_arr[i])
             elif 'chronicTissueInflam/' in self.data_arr[i]:
-                chronic_lst.append(self.data_arr[i])
+                chroc_lst.append(self.data_arr[i])
             else:
                 phth_lst.append(self.data_arr[i])
         
         if phase == "train":
-            self.data_lst = phth_lst * aug + hama_lst * aug + inflama_lst * aug + chronic_lst * aug
+            self.data_lst = phth_lst * aug + hama_lst * aug + infl_lst * aug + infe_lst * aug + chroc_lst * aug
         else:
-            self.data_lst = phth_lst + hama_lst + inflama_lst + chronic_lst
-            
+            self.data_lst = phth_lst + hama_lst + infl_lst + infe_lst + chroc_lst
+        
+      
         random.shuffle(self.data_lst)
         print("The total samples is %d" % self.__len__())
         self.crop = Crop(size=crop_size,zslice=crop_depth,phase=self.phase)
@@ -290,82 +354,15 @@ class MBDataIterTask3(Dataset):
         
         cur_dir = self.data_dir + self.data_lst[idx]
         label_lst = cur_dir.split('_')
-        label = np.zeros((4,),dtype=np.float32)
+        label = np.zeros((5,),dtype=np.float32)
         
         if 'chronicTissueInflam' in cur_dir:
-            label = 3.0
+            label = 4.0
         elif 'inflammatory_pseudo' in cur_dir:
-            label = 2.0
-        elif 'hamartoma' in cur_dir:
-            label = 1.0
-        else:
-            label = 0.0
-            
-        if self.phase == "train":
-            cur_idx = idx
-        else:
-            cur_idx = idx # self.test_dict[cur_dir]
-        imgs = self.crop(cur_dir)
-        
-        ## 训练的时候使用数据增广
-        if self.phase == "train":
-            imgs = self.augm(imgs)
-        
-        imgs = imgs[np.newaxis,:,:,:]    
-        return torch.from_numpy(imgs.astype(np.float32)), label, cur_dir
-    
-    def  __len__(self):
-        if self.phase == 'train':
-            return len(self.data_lst)
-        elif self.phase =='test':
-            return len(self.data_lst)
-        else:
-            return len(self.sample_bboxes)        
-        
-class MBDataIterTask4(Dataset):
-    def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
-        # self.data_dir = data_dir 
-        self.phase = phase
-        self.data_arr = np.load(data_file)
-        self.data_dir = "/home/DeepPhthisis/BenMalData/screenlist"
-        phth_lst = []
-        hama_lst = []
-        inflama_lst = []
-        infect_lst = []
-        
-        for i in range(len(self.data_arr)):
-            if 'soild_hamartoma/' in self.data_arr[i]:
-                hama_lst.append(self.data_arr[i])
-            elif 'soild_inflammatory_pseudo/' in self.data_arr[i]:
-                inflama_lst.append(self.data_arr[i])
-            elif 'solid_infectious/' in self.data_arr[i]:
-                infect_lst.append(self.data_arr[i])
-            else:
-                phth_lst.append(self.data_arr[i])
-        
-        if phase == "train":
-            self.data_lst = phth_lst * aug + hama_lst * aug + inflama_lst * aug + infect_lst * aug
-        else:
-            self.data_lst = phth_lst + hama_lst + inflama_lst + infect_lst
-            
-        random.shuffle(self.data_lst)
-        print("The total samples is %d" % self.__len__())
-        self.crop = Crop(size=crop_size,zslice=crop_depth,phase=self.phase)
-        self.augm = Augmentation(phase=self.phase)
-        
-    def __getitem__(self, idx, split=None):
-        t = time.time()
-        np.random.seed(int(str(t%1)[2:7]))
-        
-        cur_dir = self.data_dir + self.data_lst[idx]
-        label_lst = cur_dir.split('_')
-        label = np.zeros((4,),dtype=np.float32)
-        
-        if 'solid_infectious' in cur_dir:
             label = 3.0
-        elif 'solid_inflammatory_pseudo' in cur_dir:
+        elif 'hamartoma' in cur_dir:
             label = 2.0
-        elif 'solid_hamartoma' in cur_dir:
+        elif 'infectious' in cur_dir:
             label = 1.0
         else:
             label = 0.0
@@ -389,7 +386,7 @@ class MBDataIterTask4(Dataset):
         elif self.phase =='test':
             return len(self.data_lst)
         else:
-            return len(self.sample_bboxes)       
+            return len(self.sample_bboxes)
         
         
 class CenterCrop(object):
