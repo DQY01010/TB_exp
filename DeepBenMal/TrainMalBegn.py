@@ -340,7 +340,7 @@ if __name__ == '__main__':
         elif opt.task == "task4":
             train_iter = MBDataIterTask4(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
                                          crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
-        lif opt.task == "task5":
+        elif opt.task == "task5":
             train_iter = MBDataIterTask5(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
                                          crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
         train_loader = DataLoader(
