@@ -54,7 +54,7 @@ def parse_opts():
     parser.add_argument('--valid_path',default='',type=str)
     parser.add_argument('--tf',default=0,type=int)
     parser.add_argument('--nesterov', action='store_true', help='Nesterov momentum')
-    parser.add_argument('--pretrain_path', default=0, type=int, help='Load pretained models or not')
+    parser.add_argument('--pretrain_path', default='', type=str, help='Pretrained model (.pth)')
     parser.add_argument('--save_dir', default='results/', type=str, help='Load pretained models or not')
     parser.add_argument('--aug', default=1, type=int, help='augmentation')
     parser.add_argument('--lam', default=2, type=float, help='augmentation')
@@ -62,6 +62,13 @@ def parse_opts():
     parser.add_argument('--sample', default='over', type=str, help='augmentation')
     parser.set_defaults(nesterov=False)
     parser.add_argument('--dampening', default=0.9, type=float, help='dampening of SGD')
+    parser.add_argument(
+        '--n_finetune_classes',
+        default=400,
+        type=int,
+        help=
+        'Number of classes for fine-tuning. n_classes is set to the number when pretraining.'
+    )
     
     args = parser.parse_args()
     
