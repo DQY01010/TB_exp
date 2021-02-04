@@ -271,7 +271,21 @@ def generate_model(opt):
             pretrain = torch.load(opt.pretrain_path)
             assert opt.arch == pretrain['arch']
 
-            model.load_state_dict(pretrain['state_dict'])
+            pretrain_dict = pretrain['state_dict']
+            model_dict = model.state_dict()
+            pretrain_dict =  {k: v for k, v in pretrain_dict.items() if k in model_dict}
+            # 更新现有的model_dict
+            w = pretrain_dict['module.conv1.weight']
+            pretrain_dict['module.conv1.weight'] = torch.nn.Parameter(w[:, :1, :, :])
+            w_fc = pretrain_dict['module.fc.weight']
+            pretrain_dict['module.fc.weight'] = torch.nn.Parameter(w_fc[:opt.n_finetune_classes, :])
+            w_bias = pretrain_dict['module.fc.bias']
+            pretrain_dict['module.fc.bias'] = torch.nn.Parameter(w_bias[:opt.n_finetune_classes])
+            model_dict.update(pretrain_dict)
+            model.load_state_dict(model_dict)
+            
+            
+            #model.load_state_dict(pretrain['state_dict'])
 
             if opt.model == 'densenet':
                 model.classifier = nn.Linear(
