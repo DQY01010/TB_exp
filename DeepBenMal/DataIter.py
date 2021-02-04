@@ -25,7 +25,7 @@ class MBDataIterTask1(Dataset):
                 nonph_lst.append(self.data_arr[i])
             else:
                 ph_lst.append(self.data_arr[i])
-        
+        print(len(ph_lst),len(nonph_lst)) 
         if phase == "train":
             minus_ben = len(nonph_lst) - len(ph_lst)
             if sample_phase == 'over':
@@ -108,7 +108,7 @@ class MBDataIterTask2(Dataset):
                 nonph_lst.append(self.data_arr[i])
             else:
                 ph_lst.append(self.data_arr[i])
-        
+        print(len(ph_lst),len(nonph_lst))
         if phase == "train":
             minus_ben = len(nonph_lst) - len(ph_lst)
             if sample_phase == 'over':
@@ -189,13 +189,13 @@ class MBDataIterTask3(Dataset):
         chron_lst = []
         
         for i in range(len(self.data_arr)):
-            if 'chronicTissueInflam' in self.data_arr[i]:
+            if 'chronicTissueInflam/' in self.data_arr[i]:
                 chron_lst.append(self.data_arr[i])
-            if 'hamartoma/' in self.data_arr[i] or 'inflammatory_pseudo/' in self.data_arr[i]:
+            elif 'hamartoma/' in self.data_arr[i] or 'inflammatory_pseudo/' in self.data_arr[i]:
                 ben_lst.append(self.data_arr[i])
             else:
                 infl_lst.append(self.data_arr[i])
-        
+        print(len(chron_lst),len(ben_lst),len(infl_lst))
         if phase == "train":
             self.data_lst = infl_lst * aug + ben_lst * aug + chron_lst * aug
         else:
@@ -264,7 +264,7 @@ class MBDataIterTask4(Dataset):
                 infe_lst.append(self.data_arr[i])
             else:
                 phth_lst.append(self.data_arr[i])
-        
+        print(len(hama_lst),len(infl_lst),len(infe_lst),len(phth_lst))
         if phase == "train":
             self.data_lst = phth_lst * aug + hama_lst * aug + infl_lst * aug + infe_lst * aug
         else:
@@ -336,7 +336,7 @@ class MBDataIterTask5(Dataset):
                 chroc_lst.append(self.data_arr[i])
             else:
                 phth_lst.append(self.data_arr[i])
-        
+        print(len(hama_lst),len(infl_lst),len(infe_lst),len(chroc_lst),len(phth_lst))
         if phase == "train":
             self.data_lst = phth_lst * aug + hama_lst * aug + infl_lst * aug + infe_lst * aug + chroc_lst * aug
         else:

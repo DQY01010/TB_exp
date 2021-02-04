@@ -57,7 +57,10 @@ def train(model, data_loader, optimizer, loss, epoch):
         cls.backward()
         optimizer.step()
         pred = torch.sigmoid(out[:, :1])
-        acc = calculate_accuracy(out, target.long())
+        if opt.n_classes == 1:
+            train_acc = acc_metric(pred.data.cpu().numpy(),target.data.cpu().numpy())
+        else:
+            train_acc = calculate_accuracy(out, target.long())
         #train_acc = acc_metric(pred.data.cpu().numpy(), target.data.cpu().numpy())
 
         try:
@@ -68,10 +71,10 @@ def train(model, data_loader, optimizer, loss, epoch):
         if i % 5 == 0:
             try:
                 print("Training: Epoch %d: %dth batch, loss %2.4f, acc %2.4f, lr: %2.6f!" % (
-                epoch, i, cls.item(), acc, lr))
+                epoch, i, cls.item(), train_acc, lr))
             except:
                 print("Training: Epoch %d: %dth batch, loss %2.4f, acc %2.4f, lr: %2.6f!" % (
-                epoch, i, cls.item(), acc, lr))
+                epoch, i, cls.item(), train_acc, lr))
 
     return np.mean(train_loss)
 
@@ -116,8 +119,10 @@ def test(model, data_loader, loss, epoch, lr, max_acc, max_auc, acc_max, auc_max
         if opt.n_classes != 1:
             prob_arr = pred.data.cpu().numpy()
         label_arr = target.data.cpu().numpy()
-        #_acc = acc_metric(pred_arr, label_arr)
-        _acc = calculate_accuracy(out, target.long())
+        if opt.n_classes == 1:
+            _acc = acc_metric(pred_arr, label_arr)
+        else:
+            _acc = calculate_accuracy(out, target.long())
 
         if opt.n_classes == 1:
             for i in range(pred_arr.shape[0]):
