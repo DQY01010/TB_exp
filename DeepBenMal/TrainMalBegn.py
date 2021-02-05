@@ -282,7 +282,7 @@ if __name__ == '__main__':
         model.parameters(),
         lr=opt.lr,
         momentum=0.9,
-        weight_decay=1e-4)
+        weight_decay=1e-2)
 
     max_acc = 0
     max_auc = 0
@@ -332,7 +332,7 @@ if __name__ == '__main__':
                 model.parameters(),
                 lr=opt.lr,
                 momentum=0.9,
-                weight_decay=1e-4)
+                weight_decay=1e-2)
         if opt.task == "task1":
             train_iter = MBDataIterTask1(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
                                          crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
