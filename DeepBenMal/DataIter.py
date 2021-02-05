@@ -22,9 +22,9 @@ class MBDataIterTask1(Dataset):
         nonph_lst = []
         for i in range(len(self.data_arr)):
             if 'phthisis/' in self.data_arr[i]:
-                nonph_lst.append(self.data_arr[i])
-            else:
                 ph_lst.append(self.data_arr[i])
+            else:
+                nonph_lst.append(self.data_arr[i])
         print(len(ph_lst),len(nonph_lst)) 
         if phase == "train":
             minus_ben = len(nonph_lst) - len(ph_lst)
@@ -197,6 +197,9 @@ class MBDataIterTask3(Dataset):
                 infl_lst.append(self.data_arr[i])
         print(len(chron_lst),len(ben_lst),len(infl_lst))
         if phase == "train":
+            random.shuffle(chron_lst)
+            random.shuffle(infl_lst)
+            random.shuffle(ben_lst)
             self.data_lst = infl_lst * aug + ben_lst * aug + chron_lst * aug
         else:
             self.data_lst = infl_lst + ben_lst + chron_lst
@@ -514,6 +517,7 @@ class Augmentation(object):
         if self.phase == "train":
             ran_type = random.randint(0,1)
             if ran_type:
+                #import pdb;pdb.set_trace()
                 angle1 = np.random.rand()*180
                 img_r = rotate(img_r,angle1,axes=(1,2),reshape=False,mode='nearest')
                 

@@ -51,11 +51,11 @@ def load_value_file(file_path):
 
 def calculate_accuracy(outputs, targets):
     batch_size = targets.size(0)
-    print(outputs,targets)
+    #print(outputs,targets)
     _, pred = outputs.topk(1, 1, True)
     pred = pred.t()
     correct = pred.eq(targets.view(1, -1))
     n_correct_elems = correct.float().sum().item()
-    print(n_correct_elems)
-    import pdb;pdb.set_trace()
+    #print(n_correct_elems)
+    #import pdb;pdb.set_trace()
     return n_correct_elems / batch_size
