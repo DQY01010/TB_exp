@@ -23,6 +23,7 @@ def parse_opts():
     parser.add_argument('--n_scales', default=5, type=int)
     parser.add_argument('--scale_step', default=0.84089641525, type=float)
     parser.add_argument('--initial_scale',default=1.0,type=float)
+    parser.add_argument('--weight_decay', default=1e-4, type=float)
     
     parser.add_argument('--n_threads', default=4, type=int, help='Number of threads for multi-thread loading')
     parser.add_argument('--model_name', default='resnet', type=str, help='Currently only support resnet')
