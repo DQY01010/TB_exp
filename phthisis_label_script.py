@@ -53,10 +53,12 @@ def get_date(slc):
 dicom_dir = "/data/wangg/lung_210301"
 dicom_dir_ids = os.listdir(dicom_dir)
 for dir_ in dicom_dir_ids:
-    patient_list = glob.glob(os.path.join(dir_,"*"))
-    for case in tqdm(patient_list):
+    print(dir_)
+    patient_list = glob.glob(os.path.join(dicom_dir,dir_))
+    #print(patient_list)
+    for case in patient_list:
         ids = sitk.ImageSeriesReader_GetGDCMSeriesIDs(case)
-        print(ids)
+        #print(ids)
         for id_ in ids:
             file_names = sitk.ImageSeriesReader_GetGDCMSeriesFileNames(case, id_)
         # file_names = os.listdir(case)
