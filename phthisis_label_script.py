@@ -2,7 +2,6 @@ import os
 import numpy as np
 import SimpleITK as sitk
 import pydicom
-import redis
 import json
 import argparse
 import pandas as pd
@@ -51,9 +50,9 @@ def get_date(slc):
     
     
 # CTA_case = []
-dicom_dir = "/data1/wangg/lung_210301"
-# dicom_dir_ids = os.listdir(dicom_dir)
-for dir_ in dicom_dir:
+dicom_dir = "/data/wangg/lung_210301"
+dicom_dir_ids = os.listdir(dicom_dir)
+for dir_ in dicom_dir_ids:
     patient_list = glob.glob(os.path.join(dir_,"*"))
     for case in tqdm(patient_list):
         ids = sitk.ImageSeriesReader_GetGDCMSeriesIDs(case)
@@ -140,5 +139,5 @@ for dir_ in dicom_dir:
             print('Continue: Current series size is not 512*512!')
             continue
 
-pd.DataFrame(studies_dict).to_excel("/home/duqy/DeepPhthisis/phth.xls")      
+pd.DataFrame(studies_dict).to_excel("/home/DeepPhthisis/phth.xls")      
 
