@@ -48,10 +48,24 @@ def get_date(slc):
                 date = 'missdate'
     return date
     
+def mkdir(path):
+    path = path.strip()
+    path = path.rstrip("\\")
+    isExists = os.path.exists(path)
+
+    if not isExists:
+        os.makedirs(path)
+        print(path + 'success')
+        return True
+    else:
+        return False
+
+    
     
 # CTA_case = []
 dicom_dir = "/data/wangg/lung_210301"
 dicom_dir_ids = os.listdir(dicom_dir)
+dcm_folder = "/data/phthisis/lung_210301"
 for dir_ in dicom_dir_ids:
     #print(dir_)
     patient_list = glob.glob(os.path.join(dicom_dir,dir_))
@@ -59,6 +73,7 @@ for dir_ in dicom_dir_ids:
     for case in tqdm(patient_list):
         ids = sitk.ImageSeriesReader_GetGDCMSeriesIDs(case)
         #print(ids)
+        i = 0
         for id_ in ids:
             file_names = sitk.ImageSeriesReader_GetGDCMSeriesFileNames(case, id_)
         # file_names = os.listdir(case)
@@ -131,23 +146,36 @@ for dir_ in dicom_dir_ids:
         # date
             date = get_date(slc1)
             patient_name = str(slc1.PatientName)
-      
+            # fter.SetWindowMaximum(500)
+            # fter.SetWindowMinimum(-1300)
+            # itk_img = fter.Execute(dcm_image)
+            # img_ary = sitk.GetArrayFromImage(itk_img)
             # print(date,patient_name,patient_id)
             if dcm_image.GetSize()[0] == 512:
                 study_name = patient_id + '_' + date + '_' + horb
                 print(study_name)
                 if study_name not in studies_dict:
                     studies_dict[study_name] = [case, patient_id, date, horb, patient_name]
+                    mkdir(dcm_folder+"/"+study_name)
+                    for k in range(len(file_names)):
+                        shutil.copyfile(file_names[k], os.path.join(dcm_folder, study_name, str(len(file_names) - k - 1).zfill(3) + '.dcm'))
+
+                
                 else:
                     studies_dict[study_name].append([case, patient_id, date, horb, patient_name])
+                    study_name = study_name + "_" + i
+                    mkdir(dcm_folder + "/" + study_name)
+                    for k in range(len(file_names)):
+                        shutil.copyfile(file_names[k], os.path.join(dcm_folder, study_name, str(len(file_names) - k - 1).zfill(3) + '.dcm'))
+                    i = i + 1
             else:
                 print('Continue: Current series size is not 512*512!')
                 continue
 
 # print(studies_dict)
-with open("phth.txt","w") as f :
-    for key,value in studies_dict.items():
-        f.write(key+":"+str(value)+"\n")
+# with open("phth.txt","w") as f :
+   # for key,value in studies_dict.items():
+       # f.write(key+":"+str(value)+"\n")
 
 # pd.DataFrame.from_dict(studies_dict).to_excel("/home/DeepPhthisis/phth.xls")      
 
