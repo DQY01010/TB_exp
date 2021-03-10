@@ -62,6 +62,7 @@ for dir_ in dicom_dir:
             file_names = sitk.ImageSeriesReader_GetGDCMSeriesFileNames(case, id_)
         # file_names = os.listdir(case)
         # series_id = []
+        print(file_names)
         slice_num = len(file_names)
         if slice_num <= 30:
             print('Continue: Current series length less than 30! Series length:', slice_num)
