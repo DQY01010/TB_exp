@@ -10,7 +10,7 @@ from tqdm import tqdm
 import time
 import datetime
 import glob
-import shutil
+
 
 reader = sitk.ImageSeriesReader()
 fter = sitk.IntensityWindowingImageFilter()
@@ -73,7 +73,6 @@ for dir_ in dicom_dir_ids:
     for case in tqdm(patient_list):
         ids = sitk.ImageSeriesReader_GetGDCMSeriesIDs(case)
         #print(ids)
-        i = 0
         for id_ in ids:
             file_names = sitk.ImageSeriesReader_GetGDCMSeriesFileNames(case, id_)
         # file_names = os.listdir(case)
@@ -156,18 +155,18 @@ for dir_ in dicom_dir_ids:
                 print(study_name)
                 if study_name not in studies_dict:
                     studies_dict[study_name] = [case, patient_id, date, horb, patient_name]
-                    mkdir(dcm_folder+"/"+study_name)
-                    for k in range(len(file_names)):
-                        shutil.copyfile(file_names[k], os.path.join(dcm_folder, study_name, str(len(file_names) - k - 1).zfill(3) + '.dcm'))
-
-                
                 else:
                     studies_dict[study_name].append([case, patient_id, date, horb, patient_name])
-                    study_name = study_name + "_" + str(i)
-                    mkdir(dcm_folder + "/" + study_name)
-                    for k in range(len(file_names)):
-                        shutil.copyfile(file_names[k], os.path.join(dcm_folder, study_name, str(len(file_names) - k - 1).zfill(3) + '.dcm'))
-                    i = i + 1
+                for i in range(20):
+                    try:
+                        os.makedirs(os.path.join(dcm_folder, study_name + '_' + str(i)))
+                        outer_num = i
+                        break
+                    except:
+                        continue
+                study_name = study_name + '_' + str(outer_num)
+                for k in range(len(file_names)):
+                    shutil.copyfile(file_names[k], os.path.join(dcm_folder, study_name, str(len(file_names) - k - 1).zfill(3) + '.dcm'))
             else:
                 print('Continue: Current series size is not 512*512!')
                 continue
