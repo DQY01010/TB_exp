@@ -10,7 +10,7 @@ from tqdm import tqdm
 import time
 import datetime
 import glob
-
+import shutil
 
 reader = sitk.ImageSeriesReader()
 fter = sitk.IntensityWindowingImageFilter()
@@ -66,11 +66,11 @@ def mkdir(path):
 dicom_dir = "/data/wangg/lung_210301"
 dicom_dir_ids = os.listdir(dicom_dir)
 dcm_folder = "/data/phthisis/lung_210301"
-for dir_ in dicom_dir_ids:
+for dir_ in tqdm(dicom_dir_ids):
     #print(dir_)
     patient_list = glob.glob(os.path.join(dicom_dir,dir_))
     #print(patient_list)
-    for case in tqdm(patient_list):
+    for case in patient_list:
         ids = sitk.ImageSeriesReader_GetGDCMSeriesIDs(case)
         #print(ids)
         for id_ in ids:
