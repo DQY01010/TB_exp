@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import scipy.ndimage
 
 def is_dicom_file(filename):
-    # 判断文件是否是dicom格式
     file_stream = open(filename, 'rb')
     file_stream.seek(128)
     data = file_stream.read(4)
