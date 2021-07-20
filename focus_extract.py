@@ -1,4 +1,5 @@
 import openpyxl
+import math
 import numpy as np
 import os
 import pydicom
@@ -70,20 +71,21 @@ if __name__ == '__main__':
         if row_num == 0:
             row_num += 1
         else:
-            datapath = sheet_refine['H'+str(i)].value
+            datapath = '/home/DeepPhthisis/BenMalData/data/lung_210301/' + sheet_refine['H'+str(i)].value.split('/')[-1]
+            
 #             datapath = './0000032147_20100612/'
             overall_id = sheet_refine['D'+str(i)].value
             diamter = sheet_refine['G'+str(i)].value
             radius = math.ceil(diamter/2)
             location = sheet_refine['E'+str(i)].value
-            slice_idx = sheet_refine['F'+str(i)].value
-            x1 = int(location.split(',')[0].split('(')[1])
-            y1 = int(location.split(',')[1])
-            x2 = int(location.split(',')[2])
-            y2 = int(location.split(',')[3].split(')')[0])
+            slice_idx = int(sheet_refine['F'+str(i)].value)
+            x1 = math.floor(float(location.split(',')[0].split('(')[1]))
+            y1 = math.floor(float(location.split(',')[1]))
+            x2 = math.ceil(float(location.split(',')[2]))
+            y2 = math.ceil(float(location.split(',')[3].split(')')[0]))
             slices, spacing = load_scan(datapath)
             img_array = get_pixels_hu(datapath)
-            print(img_array.shape,spacing)
+            print(datapath,img_array.shape,spacing)
             if slice_idx - radius < 0:
                 axis_z_min = 0
             else:
@@ -99,6 +101,6 @@ if __name__ == '__main__':
 #             plt.show()
 #             plt.imshow(nodule_anno[5],cmap='gray')
 #             plt.show()
-            np.save('/data2/duqy/DeepPhthisis/BenMalData/data/tb_210301_refine/'
+            np.save('/home/DeepPhthisis/BenMalData/data/tb_210301_refine/'
                     +datapath.split('/')[-1]+'#'+overall_id.split('I')[0]+'_I'+overall_id.split('I')[1]+'.npy' ,nodule_anno)
             row_num += 1
