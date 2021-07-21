@@ -7,7 +7,7 @@ import torch
 import os
 import sys
 from torch.nn import DataParallel
-from DataIter import MBDataIterTask1,MBDataIterTask2,MBDataIterTask3,MBDataIterTask4,MBDataIterTask5
+from DataIter import MBDataIterTask1,MBDataIterTask2,MBDataIterTask3,MBDataIterTask4,MBDataIterTask5,MBDataIterSensi_Resis
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 import time
@@ -233,6 +233,14 @@ if __name__ == '__main__':
             crop_depth=opt.sample_duration,
             sample_size=opt.sample_size,
             sample_phase=None)
+    elif opt.task == "resis":
+        train_iter = MBDataIterSensi_Resis(
+            data_file= opt.valid_path + '/train_%d.npy' % opt.num_valid,
+            phase='train',
+            crop_size=opt.crop_size,
+            crop_depth=opt.sample_duration,
+            sample_size=opt.sample_size,
+            sample_phase=None)
     
     train_loader = DataLoader(
         train_iter,
@@ -255,6 +263,9 @@ if __name__ == '__main__':
                                     crop_depth=opt.sample_duration, sample_size=opt.sample_size)
     elif opt.task == "task5":
         test_iter = MBDataIterTask5(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
+                                    crop_depth=opt.sample_duration, sample_size=opt.sample_size)
+    elif opt.task == "resis":
+        test_iter = MBDataIterSensi_Resis(data_file= opt.valid_path + '/val_%d.npy' % opt.num_valid, phase='test', crop_size=opt.crop_size,
                                     crop_depth=opt.sample_duration, sample_size=opt.sample_size)
     test_loader = DataLoader(
         test_iter,
@@ -347,6 +358,9 @@ if __name__ == '__main__':
                                          crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
         elif opt.task == "task5":
             train_iter = MBDataIterTask5(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
+                                         crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
+        elif opt.task == "resis":
+            train_iter = MBDataIterSensi_Resis(data_file=opt.valid_path +'/train_%d.npy' % opt.num_valid, phase='train',
                                          crop_size=opt.crop_size, crop_depth=opt.sample_duration, sample_size=opt.sample_size, sample_phase=None)
         train_loader = DataLoader(
             train_iter,
