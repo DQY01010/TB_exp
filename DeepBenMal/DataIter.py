@@ -390,7 +390,76 @@ class MBDataIterTask5(Dataset):
             return len(self.data_lst)
         else:
             return len(self.sample_bboxes)
+
+class MBDataIterSensi_Resis(Dataset):
+    def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=64,aug=1,sample_phase='over'):
+        # self.data_dir = data_dir 
+        self.phase = phase
+        self.data_arr = np.load(data_file)
+        self.data_dir = "/home/DeepPhthisis/BenMalData/data/TB_210301_resize/"
+        sensitivity_lst = [] #mal
+        resistant_lst = [] #ben
+
+        for i in range(len(self.data_arr)):
+            if 'sensitivity/' in self.data_arr[i]:
+                sensitivity_lst.append(self.data_arr[i])
+            else:
+                resistant_lst.append(self.data_arr[i])
+        print(len(sensitivity_lst),len(resistant_lst))
+            
+        if phase == "train":
+            minus_ben = len(resistant_lst) - len(sensitivity_lst)
+            if sample_phase == 'over':
+                random.shuffle(sensitivity_lst)
+                if minus_ben > len(sensitivity_lst):
+                    minus_ben = minus_ben - len(sensitivity_lst)
+                    mal_cop = sensitivity_lst[:minus_ben] + sensitivity_lst
+                else:
+                    mal_cop = sensitivity_lst[:minus_ben]
+                self.data_lst = mal_cop * aug + sensitivity_lst * aug + resistant_lst * aug
+                
+            elif sample_phase == 'under':
+                random.shuffle(resistant_lst)
+                ben_cop = resistant_lst[:len(sensitivity_lst)]
+                self.data_lst = ben_cop + sensitivity_lst
+            else:
+                random.shuffle(resistant_lst)
+                random.shuffle(sensitivity_lst)
+                self.data_lst = resistant_lst * aug + sensitivity_lst * aug
+        else:
+            self.data_lst = resistant_lst + sensitivity_lst    
+   
+        random.shuffle(self.data_lst)
+        print("The total samples is %d" % self.__len__())
+        self.crop = Crop(size=crop_size,zslice=crop_depth,phase=self.phase)
+        self.augm = Augmentation(phase=self.phase)
+        #self.totensor = ToTensor()
+    def __getitem__(self, idx, split=None):
+        t = time.time()
+        np.random.seed(int(str(t%1)[2:7]))
         
+        cur_dir = self.data_dir + self.data_lst[idx]
+        label = np.zeros((1,),dtype=np.float32)
+        
+        if 'sensitivity' in cur_dir:
+            label[0] = 0.0
+        else:
+            label[0] = 1.0
+            
+        if self.phase == "train":
+            cur_idx = idx
+        else:
+            cur_idx = idx
+        imgs = self.crop(cur_dir)
+        
+        
+        ## 训练的时候使用数据增广
+        if self.phase == "train":
+            imgs = self.augm(imgs)
+        
+        imgs = imgs[np.newaxis,:,:,:]
+        
+        return torch.from_numpy(imgs.astype(np.float32)), torch.from_numpy(label.astype(np.float32)),cur_dir
         
 class CenterCrop(object):
     def __init__(self, size, zslice):
