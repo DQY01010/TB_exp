@@ -391,7 +391,7 @@ class MBDataIterTask5(Dataset):
         else:
             return len(self.sample_bboxes)
 
-class MBDataIterSensi_Resis(Dataset):
+class MBDataIterSensiResis(Dataset):
     def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=64,aug=1,sample_phase='over'):
         # self.data_dir = data_dir 
         self.phase = phase
@@ -460,6 +460,14 @@ class MBDataIterSensi_Resis(Dataset):
         imgs = imgs[np.newaxis,:,:,:]
         
         return torch.from_numpy(imgs.astype(np.float32)), torch.from_numpy(label.astype(np.float32)),cur_dir
+    
+    def  __len__(self):
+        if self.phase == 'train':
+            return len(self.data_lst)
+        elif self.phase =='test':
+            return len(self.data_lst)
+        else:
+            return len(self.sample_bboxes)
         
 class CenterCrop(object):
     def __init__(self, size, zslice):
