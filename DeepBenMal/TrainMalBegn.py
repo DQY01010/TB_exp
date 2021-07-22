@@ -7,7 +7,7 @@ import torch
 import os
 import sys
 from torch.nn import DataParallel
-from DataIter import MBDataIterTask1,MBDataIterTask2,MBDataIterTask3,MBDataIterTask4,MBDataIterTask5,MBDataIterSensi_Resis,MBDataIterResisClassfy
+from DataIter import MBDataIterTask1,MBDataIterTask2,MBDataIterTask3,MBDataIterTask4,MBDataIterTask5,MBDataIterSensi_Resis,MBDataIterResisClassify
 from torch.utils.data import DataLoader
 from torch.autograd import Variable
 import time

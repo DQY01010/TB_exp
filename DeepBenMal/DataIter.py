@@ -391,7 +391,7 @@ class MBDataIterTask5(Dataset):
         else:
             return len(self.sample_bboxes)
 
-class MBDataIterSensiResis(Dataset):
+class MBDataIterSensi_Resis(Dataset):
     def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=64,aug=1,sample_phase='over'):
         # self.data_dir = data_dir 
         self.phase = phase
@@ -469,7 +469,7 @@ class MBDataIterSensiResis(Dataset):
         else:
             return len(self.sample_bboxes)
 
-class MBDataIterResisClassfy(Dataset):
+class MBDataIterResisClassify(Dataset):
     def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
         # self.data_dir = data_dir 
         self.phase = phase
