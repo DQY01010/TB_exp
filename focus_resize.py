@@ -13,8 +13,8 @@ if __name__ == "__main__":
         image = scipy.ndimage.interpolation.zoom(image_array, real_resize_factor, mode='nearest')
         label = np.load('/home/DeepPhthisis/BenMalData/lung_210301_label/' + i)
         if label[0] == '1':
-            np.save("/home/DeepPhthisis/BenMalData/data/TB_210301_resize/sensitivity/"+i,image)
+            np.save("/home/DeepPhthisis/BenMalData/data/TB_210301_resize/"+i,image)
         elif label[0] == '':
             continue
         else:
-            np.save("/home/DeepPhthisis/BenMalData/data/TB_210301_resize/resistant/"+i,image)
+            np.save("/home/DeepPhthisis/BenMalData/data/TB_210301_resize/"+i,image)
