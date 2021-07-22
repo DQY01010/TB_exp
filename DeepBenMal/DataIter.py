@@ -438,10 +438,10 @@ class MBDataIterSensiResis(Dataset):
         t = time.time()
         np.random.seed(int(str(t%1)[2:7]))
         
-        cur_dir = self.data_dir + self.data_lst[idx]
+        cur_dir = self.data_dir + self.data_lst[idx].split("/")[1]
         label = np.zeros((1,),dtype=np.float32)
         
-        if 'sensitivity' in cur_dir:
+        if 'sensitivity' in self.data_lst[idx]:
             label[0] = 0.0
         else:
             label[0] = 1.0
