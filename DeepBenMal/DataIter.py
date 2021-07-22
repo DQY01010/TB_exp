@@ -468,6 +468,72 @@ class MBDataIterSensiResis(Dataset):
             return len(self.data_lst)
         else:
             return len(self.sample_bboxes)
+
+class MBDataIterResisClassfy(Dataset):
+    def __init__(self, data_file, phase="train",crop_size=48,crop_depth=16,sample_size=224,aug=1,sample_phase='over'):
+        # self.data_dir = data_dir 
+        self.phase = phase
+        self.data_arr = np.load(data_file)
+        self.data_dir = "/home/DeepPhthisis/BenMalData/data/TB_210301_resize/"
+        rifr_lst = []
+        mdr_lst = []
+        xdr_lst = []
+        #RIFR --------- MDR_TB --------- XDR_TB
+        for i in range(len(self.data_arr)):
+            if 'rifr/' in self.data_arr[i]:
+                rifr_lst.append(self.data_arr[i])
+            elif 'mdr/' in self.data_arr[i]:
+                mdr_lst.append(self.data_arr[i])
+            elif 'xdr/' in self.data_arr[i]:
+                xdr_lst.append(self.data_arr[i])
+        print(len(rifr_lst),len(mdr_lst),len(xdr_lst))
+        if phase == "train":
+            self.data_lst = rifr_lst * aug + mdr_lst * aug + xdr_lst * aug
+        else:
+            self.data_lst = rifr_lst + mdr_lst + xdr_lst
+        
+      
+        random.shuffle(self.data_lst)
+        print("The total samples is %d" % self.__len__())
+        self.crop = Crop(size=crop_size,zslice=crop_depth,phase=self.phase)
+        self.augm = Augmentation(phase=self.phase)
+        
+    def __getitem__(self, idx, split=None):
+        t = time.time()
+        np.random.seed(int(str(t%1)[2:7]))
+        
+        cur_dir = self.data_dir + self.data_lst[idx].split('/')[1]
+        label_lst = cur_dir.split('_')
+        label = np.zeros((3,),dtype=np.float32)
+        
+        if 'rifr' in self.data_lst[idx]:
+            label = 0.0
+        elif 'mdr' in self.data_lst[idx]:
+            label = 1.0
+        elif 'xdr' in self.data_lst[idx]:
+            label = 2.0
+  
+        if self.phase == "train":
+            cur_idx = idx
+        else:
+            cur_idx = idx # self.test_dict[cur_dir]
+        imgs = self.crop(cur_dir)
+        
+        ## 训练的时候使用数据增广
+        if self.phase == "train":
+            imgs = self.augm(imgs)
+        
+        imgs = imgs[np.newaxis,:,:,:]    
+        return torch.from_numpy(imgs.astype(np.float32)), label, cur_dir
+    
+    def  __len__(self):
+        if self.phase == 'train':
+            return len(self.data_lst)
+        elif self.phase =='test':
+            return len(self.data_lst)
+        else:
+            return len(self.sample_bboxes)
+
         
 class CenterCrop(object):
     def __init__(self, size, zslice):
