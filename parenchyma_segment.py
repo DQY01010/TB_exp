@@ -49,6 +49,7 @@ def plot_3d(volume, level=-300, spacing=(1.0, 1.0, 1.0),
         plt.gcf().canvas.draw()
 
 def load_scan(path):
+    print("load_scan")
 #     slices = [pydicom.read_file(path + '/' + s) for s in os.listdir(path)]
     files = os.listdir(path)
     slices = []
@@ -75,6 +76,7 @@ def load_scan(path):
     return slices, np.array([slices[0].SliceThickness, slices[0].PixelSpacing[0], slices[0].PixelSpacing[1]], dtype=np.float32)
 
 def get_pixels_hu(slices):
+    print("get_pixels_hu")
     reader = SimpleITK.ImageSeriesReader()
     reader.SetFileNames(SimpleITK.ImageSeriesReader().GetGDCMSeriesFileNames(slices))
     image = reader.Execute()
@@ -84,6 +86,7 @@ def get_pixels_hu(slices):
 
 
 def binarize_per_slice(image, spacing, intensity_th=-600, sigma=1, area_th=30, eccen_th=0.99, bg_patch_size=10):
+    print("binarize_per_slice")
     bw = np.zeros(image.shape, dtype=bool)
     
     # prepare a mask, with all corner values set to nan
@@ -113,6 +116,7 @@ def binarize_per_slice(image, spacing, intensity_th=-600, sigma=1, area_th=30, e
     return bw
 
 def all_slice_analysis(bw, spacing, cut_num=0, vol_limit=[0.68, 8.2], area_th=6e3, dist_th=62):
+    print("all_slice_analysis")
     # in some cases, several top layers need to be removed first
     if cut_num > 0:
         bw0 = np.copy(bw)
@@ -175,6 +179,7 @@ def all_slice_analysis(bw, spacing, cut_num=0, vol_limit=[0.68, 8.2], area_th=6e
     return bw, len(valid_label)
 
 def fill_hole(bw):
+    print("fill_hole")
     # fill 3d holes
     label = measure.label(~bw)
     # idendify corner components
@@ -187,6 +192,7 @@ def fill_hole(bw):
 
 def two_lung_only(bw, spacing, max_iter=22, max_ratio=4.8):    
     def extract_main(bw, cover=0.95):
+        print("extract_main")
         for i in range(bw.shape[0]):
             current_slice = bw[i]
             label = measure.label(current_slice)
@@ -212,6 +218,7 @@ def two_lung_only(bw, spacing, max_iter=22, max_ratio=4.8):
         return bw
     
     def fill_2d_hole(bw):
+        print("fill_2d_hole")
         for i in range(bw.shape[0]):
             current_slice = bw[i]
             label = measure.label(current_slice)
@@ -261,6 +268,7 @@ def resampleing(image, scan, new_spacing=[1, 1, 1]):
     # resample the distance between slices
     # spacing = np.array([[scan[0].SliceThickness], scan[0].PixelSpacing], dtype=np.float32)
 #     spacing = np.concatenate(([scan[0].SliceThickness], scan[0].PixelSpacing))
+    print("resampleing")
     spacing = np.array([scan[0].SliceThickness] + list(scan[0].PixelSpacing), dtype=np.float32)
 #     print(spacing)
     resize_factor = spacing / new_spacing
@@ -286,6 +294,7 @@ def normalize(image):
     return image
 
 def step1_python(case_path):
+    print("step1_python")
     case ,spacing= load_scan(case_path)
     case_pixels = get_pixels_hu(case_path)
     case_pixels = resampleing(case_pixels,case)
