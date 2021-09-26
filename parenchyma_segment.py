@@ -307,9 +307,14 @@ if __name__ == '__main__':
     sheet_refine = wb_refine.worksheets[0]
     row_num = 0
     for i in range(sheet_refine.max_row+1):
-        datapath = sheet_refine['E'+str(i)].value
+        if i == 0:
+            continue
+        path = sheet_refine['E'+str(i)].value
+        datapath = '/home' + path.split('duqy')[1]
+        print(datapath)
         sensity = sheet_refine['D'+str(i)].value
         case_pixels, m1, m2, spacing = step1_python(datapath)
+        print(case_pixel.shape())
         volume = np.sum(m1+m2)
         if volume == 0:
             continue
