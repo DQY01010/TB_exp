@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 import SimpleITK
 from skimage import measure, morphology
 from pandas import DataFrame
-#import dicom
-import openpyxl
+import dicom
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
+df = pd.read_excel('./Tuberculosis_classify.xlsx')
+# 11
 def is_dicom_file(filename):
     # 判断文件是否是dicom格式
     file_stream = open(filename, 'rb')
@@ -326,11 +327,11 @@ if __name__ == '__main__':
 
                 if sensity==1:
                     np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/sens_{:s}.npy".format(i), tmp[1:,:,:])
-                elif sensity==2:
+                else if sensity==2:
                     np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/resis_{:s}.npy".format(i), tmp[1:,:,:])
-                elif sensity==3:
+                else if sensity==3:
                     np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/rifam_{:s}.npy".format(i), tmp[1:,:,:])
-                elif sensity==4:
+                else if sensity==4:
                     np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/MDR_{:s}.npy".format(i), tmp[1:,:,:])
-                elif sensity==5:
+                else if sensity==5:
                     np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/XDR_{:s}.npy".format(i), tmp[1:,:,:])
