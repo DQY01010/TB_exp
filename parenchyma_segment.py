@@ -154,8 +154,6 @@ def all_slice_analysis(bw, spacing, cut_num=0, vol_limit=[0.68, 8.2], area_th=6e
             valid_label.add(vol.label)
             
     bw = np.in1d(label, list(valid_label)).reshape(label.shape)
-#     plt.imshow(bw[150],cmap='gray')
-#     plt.show() 
     # fill back the parts removed earlier
     if cut_num > 0:
         # bw1 is bw with removed slices, bw2 is a dilated version of bw, part of their intersection is returned as final mask
