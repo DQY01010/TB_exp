@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import SimpleITK
 from skimage import measure, morphology
 from pandas import DataFrame
-import dicom
+#import dicom
+import openpyxl
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
