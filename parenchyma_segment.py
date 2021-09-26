@@ -12,8 +12,6 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
 df = pd.read_excel('./Tuberculosis_classify.xlsx')
-# df2 = pd.read_excel('/home/dqy/test.xlsx')
-
 def is_dicom_file(filename):
     # 判断文件是否是dicom格式
     file_stream = open(filename, 'rb')
