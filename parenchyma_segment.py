@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import SimpleITK
 from skimage import measure, morphology
 from pandas import DataFrame
-import openpyxl
+import dicom
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 
 
@@ -317,17 +317,14 @@ if __name__ == '__main__':
     sheet_refine = wb_refine.worksheets[0]
     row_num = 0
     for i in range(sheet_refine.max_row+1):
-        if i == 0 or i == 1:
+        if i == 0:
             continue
         path = sheet_refine['E'+str(i)].value
-        path_split = path.split('/')[-1]
         datapath = '/home' + path.split('duqy')[1]
         print(datapath)
-        if path.split('_')[-2] == 'HC':
-            continue
         sensity = sheet_refine['D'+str(i)].value
         case_pixels, m1, m2, spacing = step1_python(datapath)
-        #print(case_pixel.shape())
+        print(case_pixel.shape())
         volume = np.sum(m1+m2)
         if volume == 0:
             continue
@@ -342,13 +339,13 @@ if __name__ == '__main__':
                 k = k.reshape(1,w,h)
                 tmp = np.vstack([tmp,k])
 
-                if sensity == "1":
-                    np.save("/home/DeepPhthisis/BenMalData/data/tb_210924_overall/sens_{:s}.npy".format(path_split), tmp[1:,:,:])
-                elif sensity== "2":
-                    np.save("/home/DeepPhthisis/BenMalData/data/tb_210924_overall/resis_{:s}.npy".format(path_split), tmp[1:,:,:])
-                elif sensity== "3":
-                    np.save("/home/DeepPhthisis/BenMalData/data/tb_210924_overall/rifam_{:s}.npy".format(path_split), tmp[1:,:,:])
-                elif sensity== "4":
-                    np.save("/home/DeepPhthisis/BenMalData/data/tb_210924_overall/MDR_{:s}.npy".format(path_split), tmp[1:,:,:])
-                elif sensity== "5":
-                    np.save("/home/DeepPhthisis/BenMalData/data/tb_210924_overall/XDR_{:s}.npy".format(path_split), tmp[1:,:,:])
+                if sensity==1:
+                    np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/sens_{:s}.npy".format(i), tmp[1:,:,:])
+                else if sensity==2:
+                    np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/resis_{:s}.npy".format(i), tmp[1:,:,:])
+                else if sensity==3:
+                    np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/rifam_{:s}.npy".format(i), tmp[1:,:,:])
+                else if sensity==4:
+                    np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/MDR_{:s}.npy".format(i), tmp[1:,:,:])
+                else if sensity==5:
+                    np.save("/data2/duqy/DeepPhthisis/BenMalData/data/tb_210924_overall/XDR_{:s}.npy".format(i), tmp[1:,:,:])
